@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Actividades de recuperación de Excel para primero EMS: funciones, rangos y un entregable en PDF.">
+<title>Actividades de recuperación para primero EMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0}img,svg{max-width:100%}button,input,select,textarea{font:inherit}[hidden]{display:none!important}
+
+/* Concepto: una planilla de trabajo. Barra de fórmulas arriba, celdas amarillas para completar, cuadrícula azul de papel. */
+:root{
+  --bg:#F1F4F8; --surface:#FFFFFF; --surface-2:#E8EEF5; --head:#E3EAF3;
+  --ink:#12203A; --ink-2:#4B5B75; --line:#D3DCE8; --grid:#CBD6E4;
+  --accent:#1B4FD8; --accent-ink:#FFFFFF; --accent-soft:#E4ECFD;
+  --input:#FFE887; --input-line:#D9B93A; --input-ink:#4A3B00;
+  --ok:#1C7A4B; --ok-bg:#E3F4EA; --bad:#A93226; --bad-bg:#FBE9E6;
+  --formula:#7A1F1F; --formula-bg:#EEF6EC;
+  --f-display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Consolas,Menlo,monospace;
+  --hh:68px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1526; --surface:#152037; --surface-2:#1C2A45; --head:#1C2A45;
+    --ink:#E7EDF7; --ink-2:#A3B3CC; --line:#2A3A58; --grid:#2A3A58;
+    --accent:#86A9FF; --accent-ink:#0D1526; --accent-soft:#1B2C52;
+    --input:#5B4A0A; --input-line:#B3951F; --input-ink:#FFF0B3;
+    --ok:#5FD39A; --ok-bg:#12372A; --bad:#FF9185; --bad-bg:#3E1C1A;
+    --formula:#FFB9AD; --formula-bg:#16301F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1526; --surface:#152037; --surface-2:#1C2A45; --head:#1C2A45;
+  --ink:#E7EDF7; --ink-2:#A3B3CC; --line:#2A3A58; --grid:#2A3A58;
+  --accent:#86A9FF; --accent-ink:#0D1526; --accent-soft:#1B2C52;
+  --input:#5B4A0A; --input-line:#B3951F; --input-ink:#FFF0B3;
+  --ok:#5FD39A; --ok-bg:#12372A; --bad:#FF9185; --bad-bg:#3E1C1A;
+  --formula:#FFB9AD; --formula-bg:#16301F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--f-body); font-size:16px; line-height:1.6;
+  padding-inline:max(16px, env(safe-area-inset-left,0px)) max(16px, env(safe-area-inset-right,0px));
+  padding-block:0 56px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); background:var(--bg); z-index:30}
+h1,h2,h3{font-family:var(--f-display); font-weight:700; line-height:1.15; margin:0; text-wrap:balance; letter-spacing:-0.01em}
+h1{font-size:clamp(1.9rem,4.6vw,2.9rem)}
+h2{font-size:clamp(1.35rem,2.6vw,1.7rem)}
+h3{font-size:1.1rem}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:var(--f-mono)}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px; border-radius:4px}
+.wrap{max-width:1180px; margin-inline:auto}
+
+header.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:31;
+  background:var(--bg); border-bottom:1px solid var(--line);
+  margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px))) calc(-1 * max(16px, env(safe-area-inset-right,0px)));
+  padding-inline:max(16px, env(safe-area-inset-left,0px)) max(16px, env(safe-area-inset-right,0px));
+}
+header.top .wrap{display:flex; align-items:center; gap:8px 24px; flex-wrap:wrap; padding-block:10px}
+.brand{font-family:var(--f-display); font-weight:700; font-size:1.2rem; text-decoration:none; color:var(--ink); display:flex; align-items:center; gap:10px; white-space:nowrap}
+.brand .fx{font-family:var(--f-mono); font-weight:600; font-size:.8rem; border:1.5px solid var(--ink); border-radius:4px; padding:1px 6px}
+nav.tabs{display:flex; flex-wrap:wrap; gap:0 2px; flex:1 1 420px; min-width:0}
+nav.tabs a{
+  text-decoration:none; color:var(--ink-2); font-weight:500; font-size:.93rem; white-space:nowrap;
+  padding:8px 12px; border-bottom:3px solid transparent;
+}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{color:var(--ink); border-bottom-color:var(--accent); font-weight:600}
+
+main{padding-block:32px 0}
+.view[hidden]{display:none}
+.view-head{display:flex; flex-direction:column; gap:10px; margin-bottom:26px; max-width:70ch}
+.lead{color:var(--ink-2); font-size:1.06rem}
+.stack{display:flex; flex-direction:column; gap:28px}
+.cols2{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); gap:16px}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px; min-width:0}
+.panel h3{margin-bottom:8px}
+.panel p+p{margin-top:8px}
+.note{background:var(--accent-soft); border-radius:8px; padding:12px 14px; color:var(--ink); font-size:.95rem}
+.sec-title{display:flex; flex-direction:column; gap:6px; margin-bottom:14px}
+.sec-title p{color:var(--ink-2); max-width:70ch}
+
+.btn{
+  font:inherit; font-size:.92rem; font-weight:600; cursor:pointer; padding:8px 14px; min-height:38px;
+  border:1.5px solid var(--ink); border-radius:6px; background:var(--surface); color:var(--ink);
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:var(--line); color:var(--ink-2); font-weight:500}
+.btn[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.btn.link{border:none; background:none; color:var(--accent); padding:6px 4px; text-decoration:underline; font-weight:500}
+
+ol.steps{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:6px}
+ul.check{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px}
+ul.check label{display:flex; gap:10px; align-items:flex-start; padding:6px 4px; cursor:pointer}
+ul.check input{margin-top:5px; width:18px; height:18px; accent-color:var(--accent); flex:none}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:12px}
+.stat{background:var(--surface-2); border-radius:8px; padding:12px 14px}
+.stat b{display:block; font-family:var(--f-mono); font-size:1.5rem; font-weight:600}
+.stat span{color:var(--ink-2); font-size:.9rem}
+
+.concepts{display:flex; flex-direction:column; border:1px solid var(--line); border-radius:10px; background:var(--surface); overflow:hidden}
+.concept{display:grid; grid-template-columns:minmax(120px,.6fr) 1.6fr 1.6fr; gap:6px 20px; padding:12px 18px; border-top:1px solid var(--line)}
+.concept:first-child{border-top:none}
+.concept dt{font-weight:600}
+.concept dd{margin:0; color:var(--ink-2); font-size:.95rem}
+.concept dd.rec{color:var(--ink)}
+@media (max-width:760px){.concept{grid-template-columns:1fr}.concept dt{font-family:var(--f-display); font-size:1.05rem}}
+
+.tablewrap{border:1px solid var(--line); border-radius:10px; background:var(--surface); overflow:hidden}
+table.t{border-collapse:collapse; width:100%; font-size:.93rem}
+table.t th{background:var(--head); text-align:left; padding:9px 12px; font-weight:600; border-bottom:1px solid var(--line)}
+table.t td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top}
+table.t tr:first-child td{border-top:none}
+.fcell{font-family:var(--f-mono); font-weight:600; font-size:.86rem; color:var(--formula); background:var(--formula-bg); overflow-wrap:break-word}
+.res{font-family:var(--f-mono); font-weight:600; background:var(--formula-bg); overflow-wrap:break-word}
+td.num{text-align:right; font-variant-numeric:tabular-nums}
+
+.fxbar{display:flex; align-items:center; gap:0; border:1.5px solid var(--ink); border-radius:6px; background:var(--surface); overflow:hidden; min-width:0}
+.fxbar .fxl{font-family:var(--f-mono); font-weight:600; padding:9px 12px; background:var(--head); border-right:1.5px solid var(--ink); font-size:.9rem}
+.fxbar .val{font-family:var(--f-mono); font-weight:600; padding:9px 12px; color:var(--formula); white-space:normal; overflow-wrap:anywhere; min-width:0; flex:1}
+.result{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; padding:14px 16px; border-radius:8px; background:var(--formula-bg); border:1px solid var(--line)}
+.result .big{font-family:var(--f-mono); font-size:2rem; font-weight:600; color:var(--formula); overflow-wrap:anywhere}
+.result .small{color:var(--ink-2); font-size:.92rem}
+.result.err .big{font-size:1.05rem; color:var(--bad); font-family:var(--f-body); font-weight:500}
+
+.lab-layout{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,640px); gap:22px; align-items:start}
+.lab-layout .ctl{display:flex; flex-direction:column; gap:14px; min-width:0}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{font-family:var(--f-mono); font-size:.82rem; padding:7px 10px; min-height:36px}
+.fields{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:end}
+.fields label{display:flex; flex-direction:column; gap:3px; font-size:.82rem; color:var(--ink-2); font-weight:500}
+.fi,.fields select,.fields input[type=text],.fields input[type=number]{
+  font:inherit; font-family:var(--f-mono); font-size:.92rem; padding:7px 10px; min-height:38px; min-width:0;
+  border:1.5px solid var(--input-line); border-radius:6px; background:var(--input); color:var(--input-ink);
+}
+.fields select{font-family:var(--f-body)}
+.fi::placeholder{color:var(--input-ink); opacity:.55}
+.switch{display:flex; gap:8px; align-items:center; font-size:.92rem; color:var(--ink-2)}
+.switch input{width:18px; height:18px; accent-color:var(--accent)}
+
+.sheet{background:var(--surface); border:1.5px solid var(--ink); border-radius:8px; min-width:0}
+.sheet summary{cursor:pointer; font-weight:600; padding:10px 14px; background:var(--head); border-radius:6px; list-style:none; display:flex; justify-content:space-between; gap:10px}
+.sheet summary::-webkit-details-marker{display:none}
+.sheet summary::after{content:"mostrar / ocultar"; font-weight:400; color:var(--ink-2); font-size:.82rem; white-space:nowrap}
+.sheet .scroll{overflow:hidden}
+.colgroups{display:none}
+table.grid{border-collapse:collapse; font-size:.78rem; line-height:1.3; width:100%; font-variant-numeric:tabular-nums; user-select:none; -webkit-user-select:none}
+table.grid th,table.grid td{border:1px solid var(--grid); padding:4px 7px; overflow-wrap:break-word}
+table.grid thead th{background:var(--head)}
+table.grid thead tr:nth-child(2) th{font-weight:600}
+table.grid th.rn{background:var(--head); text-align:center; color:var(--ink-2); font-weight:500}
+table.grid th.col{cursor:pointer; color:var(--accent)}
+table.grid th.col:hover{background:var(--accent-soft)}
+table.grid td{cursor:cell; background:var(--surface)}
+table.grid td.n{text-align:right}
+table.grid td.blank{color:var(--ink-2)}
+table.grid td:hover{background:var(--accent-soft)}
+table.grid td.sel,table.grid td.ref{background:var(--input); color:var(--input-ink)}
+table.grid td.drag{background:var(--accent-soft); outline:1px dashed var(--accent)}
+.hintline{font-size:.82rem; color:var(--ink-2); padding:8px 14px; border-top:1px solid var(--line)}
+
+.practice{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,640px); gap:24px; align-items:start}
+.practice .side{position:sticky; top:calc(env(safe-area-inset-top,0px) + var(--hh) + 12px); max-height:calc(100vh - var(--hh) - 28px); overflow-y:auto; overflow-x:hidden}
+.progress{display:flex; align-items:center; gap:12px; margin-bottom:6px}
+.bar{flex:1; height:10px; background:var(--surface-2); border-radius:6px; overflow:hidden; border:1px solid var(--line)}
+.bar i{display:block; height:100%; background:var(--ok); width:0; transition:width .25s}
+.ex{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0}
+.ex.done{border-color:var(--ok)}
+.ex-head{display:flex; gap:12px}
+.ex-n{flex:none; width:26px; height:26px; border-radius:50%; background:var(--ink); color:var(--bg); font-weight:600; font-size:.82rem; display:grid; place-items:center; margin-top:1px}
+.ex.done .ex-n{background:var(--ok); color:var(--surface)}
+.ex-row{display:flex; flex-wrap:wrap; gap:8px}
+.ex-row .fi{flex:1 1 240px}
+.fb{font-size:.93rem}
+.fb:empty{display:none}
+.fb.ok{color:var(--ok); font-weight:600}
+.fb.bad{color:var(--bad)}
+.fb.info{color:var(--ink-2)}
+.sol{background:var(--surface-2); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:6px; font-size:.93rem}
+.sol code{font-weight:600; color:var(--formula); overflow-wrap:anywhere}
+.list{display:flex; flex-direction:column; gap:14px}
+
+.q{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:12px}
+.q .qt{display:flex; gap:12px}
+.q .opts{display:flex; flex-direction:column; gap:8px}
+.opt{font:inherit; text-align:left; display:flex; gap:12px; align-items:flex-start; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink); cursor:pointer; min-height:44px}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt b{font-family:var(--f-mono); flex:none; width:1.4em}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.wrong{border-color:var(--bad); background:var(--bad-bg)}
+.expl{font-size:.93rem; color:var(--ink-2); border-top:1px solid var(--line); padding-top:10px}
+.expl strong{color:var(--ink)}
+.score{display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; justify-content:space-between}
+
+.demo{display:grid; grid-template-columns:auto minmax(0,1fr); gap:22px; align-items:start}
+table.mini{border-collapse:collapse; font-family:var(--f-mono); user-select:none; -webkit-user-select:none}
+table.mini th{background:var(--head); padding:4px 14px; border:1px solid var(--grid); font-family:var(--f-body); font-weight:600; color:var(--ink-2)}
+table.mini td{border:1px solid var(--grid); padding:7px 18px; text-align:right; cursor:cell; background:var(--surface); min-width:72px}
+table.mini td.sel{background:var(--input); color:var(--input-ink)}
+table.mini th.rn{width:36px}
+@media (max-width:520px){.demo{grid-template-columns:1fr}}
+
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(20px + env(safe-area-inset-bottom,0px)); background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:8px; font-size:.93rem; z-index:40; max-width:calc(100% - 32px)}
+
+@media (max-width:1000px){
+  .lab-layout,.practice{grid-template-columns:minmax(0,1fr)}
+  .practice .side{position:static; order:-1}
+}
+@media (max-width:1200px){
+  /* tabla de seis columnas: una tarjeta por fila */
+  .tablewrap:has(table.wide){border:none; background:none; border-radius:0; overflow:visible}
+  table.t.wide,table.t.wide thead,table.t.wide tbody,table.t.wide tr,table.t.wide td{display:block; width:100%}
+  table.t.wide thead{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+  table.t.wide tr{border:1px solid var(--line); border-radius:10px; background:var(--surface); margin-bottom:10px; overflow:hidden}
+  table.t.wide td{display:grid; grid-template-columns:minmax(6.5rem,28%) minmax(0,1fr); gap:4px 12px; padding:8px 12px; border-top:1px solid var(--line)}
+  table.t.wide tr:first-child td{border-top:1px solid var(--line)}
+  table.t.wide td::before{content:attr(data-label); font-weight:600; color:var(--ink-2); font-size:.82rem; font-family:var(--f-body)}
+  table.t.wide td:first-child,table.t.wide tr:first-child td:first-child{display:block; border-top:none; background:var(--head); font-size:1rem}
+  table.t.wide td:first-child::before{display:none}
+}
+@media (max-width:820px){
+  /* el resto de las tablas: también una tarjeta por fila */
+  .tablewrap{border:none; background:none; border-radius:0; overflow:visible}
+  table.t,table.t thead,table.t tbody,table.t tr,table.t td{display:block; width:100%}
+  table.t thead{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+  table.t tr{border:1px solid var(--line); border-radius:10px; background:var(--surface); margin-bottom:10px; overflow:hidden}
+  table.t td{display:grid; grid-template-columns:minmax(6.5rem,28%) minmax(0,1fr); gap:4px 12px; padding:8px 12px; border-top:1px solid var(--line)}
+  table.t tr:first-child td{border-top:1px solid var(--line)}
+  table.t td::before{content:attr(data-label); font-weight:600; color:var(--ink-2); font-size:.82rem; font-family:var(--f-body)}
+  table.t td:first-child,table.t tr:first-child td:first-child{display:block; border-top:none; background:var(--head); font-size:1rem}
+  table.t td:first-child::before{display:none}
+  table.t td.num{text-align:left}
+  header.top{position:static}
+  nav.tabs a{padding:8px 10px}
+}
+@media (max-width:640px){
+  /* planilla: dos grupos de columnas en lugar de una barra de desplazamiento */
+  .colgroups{display:flex; flex-wrap:wrap; gap:8px; padding:10px 14px 0}
+  .sheet summary::after{display:none}
+  .sheet.g1 [data-c="F"],.sheet.g1 [data-c="G"],.sheet.g1 [data-c="H"],
+  .sheet.g2 [data-c="B"],.sheet.g2 [data-c="D"],.sheet.g2 [data-c="E"]{display:none}
+  table.grid{font-size:.76rem}
+  table.grid th,table.grid td{padding:4px 5px; overflow-wrap:anywhere}
+  table.grid thead th{font-size:.68rem}
+  table.grid th.rn{white-space:nowrap; overflow-wrap:normal; padding-inline:4px}
+  table.grid thead th[data-c="H"]{font-size:.6rem; padding-inline:3px}
+}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.bar i{transition:none}}
+
+/* ---- tutoría: agregados ---- */
+.docente-banner{background:var(--accent-soft); border:1.5px dashed var(--accent); border-radius:10px; padding:12px 16px; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; justify-content:space-between}
+textarea.fi{font-family:var(--f-body); width:100%; min-height:84px; resize:vertical; display:block}
+.act-h{display:flex; flex-direction:column; gap:6px; margin:6px 0 0}
+.act-h p{color:var(--ink-2); max-width:70ch}
+.refl{background:var(--surface-2); border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:8px}
+.refl label{font-weight:600}
+.fill{margin-top:4px; font-size:.9rem}
+.fill summary{cursor:pointer; color:var(--accent); font-weight:500}
+table.fl{border-collapse:collapse; width:100%; table-layout:fixed; margin-top:8px; font-size:.82rem}
+table.fl th,table.fl td{border:1px solid var(--line); padding:4px 6px; text-align:left; overflow-wrap:anywhere; vertical-align:top}
+table.fl th{background:var(--head)}
+table.fl td.f{font-family:var(--f-mono); color:var(--formula)}
+.sub{color:var(--ink-2); font-size:.9rem}
+
+/* entregable */
+.paper{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:22px 24px; display:flex; flex-direction:column; gap:18px; min-width:0}
+.paper h2{font-size:1.5rem}
+.paper h3{font-size:1.1rem; margin-bottom:6px}
+.idrow{display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px}
+.idrow label{display:flex; flex-direction:column; gap:3px; font-size:.82rem; color:var(--ink-2); font-weight:500; min-width:0}
+.idrow input{font:inherit; font-size:1rem; padding:7px 10px; min-height:38px; min-width:0; border:1.5px solid var(--input-line); border-radius:6px; background:var(--input); color:var(--input-ink)}
+.sumline{display:flex; flex-wrap:wrap; gap:6px 24px; padding:10px 14px; border:1.5px solid var(--ink); border-radius:8px; font-weight:600}
+table.dt{border-collapse:collapse; width:100%; table-layout:fixed; font-size:.9rem}
+table.dt th,table.dt td{border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; overflow-wrap:anywhere}
+table.dt th{background:var(--head)}
+table.dt td.f{font-family:var(--f-mono); font-weight:600; color:var(--formula)}
+table.dt td.st{font-weight:600; white-space:normal}
+table.dt td.ok{color:var(--ok)} table.dt td.bad{color:var(--bad)} table.dt td.none{color:var(--ink-2)}
+.txtans{border:1px solid var(--line); border-radius:8px; padding:8px 12px; white-space:pre-wrap; overflow-wrap:anywhere; min-height:3em}
+.txtans.empty{color:var(--ink-2)}
+.prt{display:none}
+.steps3{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:12px}
+.steps3 div{background:var(--surface-2); border-radius:8px; padding:12px 14px}
+.steps3 b{display:block; margin-bottom:4px}
+@media screen and (max-width:640px){
+  .idrow{grid-template-columns:1fr}
+  .paper{padding:16px 14px}
+  table.dt.stk,table.dt.stk thead,table.dt.stk tbody,table.dt.stk tr,table.dt.stk td{display:block; width:100%}
+  table.dt.stk thead{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+  table.dt.stk tr{border:1px solid var(--line); border-radius:8px; margin-bottom:8px; overflow:hidden}
+  table.dt.stk td{display:grid; grid-template-columns:minmax(5.5rem,30%) minmax(0,1fr); gap:4px 10px; border:none; border-top:1px solid var(--line)}
+  table.dt.stk td:first-child{border-top:none; background:var(--head); display:block}
+  table.dt.stk td:first-child::before{display:none}
+  table.dt.stk td::before{content:attr(data-label); font-weight:600; color:var(--ink-2); font-size:.8rem; font-family:var(--f-body)}
+}
+
+@media print{
+  @page{size:A4; margin:14mm}
+  :root:root:root{
+    --bg:#fff; --surface:#fff; --surface-2:#f2f2f2; --head:#e9e9e9;
+    --ink:#000; --ink-2:#333; --line:#999; --grid:#999;
+    --accent:#000; --accent-soft:#eee; --input:#fff; --input-line:#666; --input-ink:#000;
+    --ok:#0b5b2f; --ok-bg:#fff; --bad:#8a1c12; --bad-bg:#fff; --formula:#000; --formula-bg:#fff;
+    color-scheme:light;
+  }
+  html,body{background:#fff !important; color:#000 !important}
+  body{padding:0 !important; font-size:10.5pt; line-height:1.4}
+  body::before,header.top,.toast,.noprint,.view:not(#v-entregable){display:none !important}
+  main{padding:0 !important}
+  .wrap{max-width:none}
+  .paper{border:none; padding:0; gap:12px}
+  .paper h2{font-size:17pt}
+  .paper h3{font-size:12pt}
+  .idrow{grid-template-columns:2fr 1fr 1fr}
+  .idrow input{border:none; border-bottom:1px solid #000; border-radius:0; padding:2px 0; min-height:0; font-size:11pt}
+  .sumline{border-color:#000}
+  table.dt{font-size:9pt}
+  table.dt,table.fl{page-break-inside:auto}
+  table.dt tr,.txtans{break-inside:avoid; page-break-inside:avoid}
+  table.dt thead{display:table-header-group}
+  table.dt td.f{font-weight:600}
+  .scr{display:none !important}
+  .prt{display:block}
+  .txtans{border-color:#666}
+  .paper section{break-inside:auto}
+  .paper section.nobreak{break-inside:avoid; page-break-inside:avoid}
+  .paper h3{break-after:avoid; page-break-after:avoid}
+}
+.ex-row .fi{font-size:.8rem; padding-inline:8px}
+.brand{white-space:normal; line-height:1.15}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio"><span class="fx">fx</span>Actividades de recuperación</a>
+    <nav class="tabs" id="tabs" aria-label="Secciones">
+      <a href="#inicio" data-v="inicio">Inicio</a>
+      <a href="#basico" data-v="basico">Lo básico</a>
+      <a href="#funciones" data-v="funciones">Funciones</a>
+      <a href="#actividades" data-v="actividades">Actividades</a>
+      <a href="#autoevaluacion" data-v="autoevaluacion">Autoevaluación</a>
+      <a href="#entregable" data-v="entregable">Entregable</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="view" id="v-inicio" hidden>
+  <div class="view-head">
+    <h1>Excel: funciones y rangos</h1>
+    <p class="lead">Material para recuperar el tema como tarea. Leés la teoría, probás con una planilla, resolvés tres actividades y al final generás un PDF para subir a la plataforma (CREA).</p>
+  </div>
+  <div class="stack">
+    <div class="docente-banner noprint" id="doc-banner" hidden>
+      <span><b>Modo docente.</b> En el Entregable aparece la fórmula esperada de cada ejercicio.</span>
+      <button class="btn" id="doc-fill" type="button">Rellenar con respuestas modelo</button>
+    </div>
+    <div class="stats" id="home-stats"></div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Qué trabajamos</h3>
+        <p>Qué es una celda, un rango y una función, y cómo se relacionan. Las funciones SUMA, PROMEDIO, MAX, MIN, CONTAR, CONTARA, CONTAR.BLANCO, CONTAR.SI y SI.</p>
+      </div>
+      <div class="panel">
+        <h3>Qué tenés que entregar</h3>
+        <p>Un PDF con tus fórmulas, tus resultados y la autoevaluación. Se arma solo a partir de lo que hagas en <a href="#actividades">Actividades</a> y <a href="#autoevaluacion">Autoevaluación</a>. Lo generás en la pestaña <a href="#entregable">Entregable</a>.</p>
+      </div>
+    </div>
+    <div class="panel">
+        <h3>Cómo hacerlo, en orden</h3>
+        <ol class="steps">
+          <li>Leé <a href="#basico">Lo básico</a> y probá la planilla de ejemplo.</li>
+          <li>Pasá por <a href="#funciones">Funciones</a>: elegí una función, seleccioná un rango y mirá qué pasa.</li>
+          <li>Resolvé las tres <a href="#actividades">Actividades</a>. Podés verificar cada fórmula las veces que quieras.</li>
+          <li>Contestá la <a href="#autoevaluacion">Autoevaluación</a>.</li>
+          <li>Completá tu nombre en el <a href="#entregable">Entregable</a>, guardalo como PDF y subilo a CREA.</li>
+        </ol>
+      </div>
+    <div class="panel">
+      <h3>Importante: tu avance se guarda en este navegador</h3>
+      <p>Si cambiás de computadora o de navegador, el avance no aparece. Si usás una computadora compartida del liceo, generá el PDF antes de irte y después tocá el botón de abajo para borrar tus datos.</p>
+      <p style="margin-top:12px"><button class="btn ghost" id="reset" type="button">Borrar mis datos de este equipo</button></p>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-basico" hidden>
+  <div class="view-head">
+    <h1>Lo básico</h1>
+    <p class="lead">Vocabulario que vamos a usar todo el tiempo. Lo más importante: una <b>función</b> hace un cálculo y un <b>rango</b> le dice sobre qué celdas.</p>
+  </div>
+  <div class="stack">
+    <div class="panel">
+      <div class="sec-title"><h2>Probalo: función y rango</h2><p>Tocá una celda, o arrastrá sobre varias, para cambiar el rango. Después elegí la función.</p></div>
+      <div class="demo">
+        <table class="mini" id="mini" aria-label="Columna B con cinco números"></table>
+        <div class="ctl" style="display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div class="chips" id="mini-fn"></div>
+          <div class="fxbar"><span class="fxl">fx</span><span class="val" id="mini-f"></span></div>
+          <div class="result"><span class="big" id="mini-r"></span><span class="small" id="mini-s"></span></div>
+          <p class="note">Mismo rango y otra función: cambia el cálculo. Misma función y otro rango: cambian los datos que se usan.</p>
+        </div>
+      </div>
+    </div>
+    <div class="concepts" id="concepts"></div>
+    <div>
+      <div class="sec-title"><h2>Referencias al copiar una fórmula</h2><p>Al arrastrar una fórmula hacia abajo, Excel la copia en cada fila y mueve las referencias. Lo vas a usar en la Actividad 3.</p></div>
+      <div class="tablewrap"><table class="t" id="t-ref"></table></div>
+    </div>
+    <div>
+      <div class="sec-title"><h2>Comparar valores</h2><p>Estos operadores dan VERDADERO o FALSO. Los vas a usar en la condición de SI y en CONTAR.SI.</p></div>
+      <div class="tablewrap"><table class="t" id="t-cmp"></table></div>
+    </div>
+    <div>
+      <div class="sec-title"><h2>Cuando algo sale mal</h2><p>Excel avisa con un mensaje dentro de la celda.</p></div>
+      <div class="tablewrap"><table class="t" id="t-err"></table></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-funciones" hidden>
+  <div class="view-head">
+    <h1>Las funciones</h1>
+    <p class="lead">Elegí una función, seleccioná un rango en la planilla y mirá la fórmula y el resultado. Los datos son los mismos de las actividades: 12 productos de la cantina de un liceo, en las filas 2 a 13.</p>
+  </div>
+  <div class="stack">
+    <div class="lab-layout">
+      <div class="ctl">
+        <div class="chips" id="lab-fn" role="group" aria-label="Función"></div>
+        <p id="lab-desc" class="note"></p>
+        <div class="fields" id="lab-extra"></div>
+        <div class="fxbar"><span class="fxl">fx</span><span class="val" id="lab-f"></span></div>
+        <div class="result" id="lab-res"><span class="big" id="lab-r"></span><span class="small" id="lab-s"></span></div>
+        <p id="lab-stats" class="small" style="color:var(--ink-2);font-size:.92rem"></p>
+        <label class="switch"><input type="checkbox" id="lab-multi"> Celdas sueltas (rango no contiguo). También con Ctrl o Cmd + clic.</label>
+      </div>
+      <div id="lab-grid"></div>
+    </div>
+    <div>
+      <div class="sec-title"><h2>Resumen de las nueve funciones</h2><p>Los resultados se calculan sobre la planilla de arriba. En un Excel en inglés los nombres son: SUM, AVERAGE, MAX, MIN, COUNT, COUNTA, COUNTBLANK, COUNTIF e IF.</p></div>
+      <div class="tablewrap"><table class="t wide" id="t-fn"></table></div>
+    </div>
+    <div>
+      <div class="sec-title"><h2>CONTAR, CONTARA y CONTAR.BLANCO sobre el mismo rango</h2><p>Cada función mira algo distinto de las celdas. Por eso dan resultados distintos.</p></div>
+      <div class="tablewrap"><table class="t" id="t-count"></table></div>
+      <p class="note" style="margin-top:10px">En Producto no hay números, así que CONTAR da 0. En Stock hay 10 celdas con número y 2 vacías: CONTAR y CONTARA dan 10 y CONTAR.BLANCO da 2. Juntas, 10 y 2 suman las 12 filas.</p>
+    </div>
+    <div>
+      <div class="sec-title"><h2>Cómo se escribe la condición</h2></div>
+      <div class="tablewrap"><table class="t" id="t-crit"></table></div>
+    </div>
+    <div class="panel">
+      <h3>Para recordar</h3>
+      <ul style="margin:8px 0 0; padding-left:1.2em; display:flex; flex-direction:column; gap:6px">
+        <li>El rango dice dónde mirar y la función dice qué hacer.</li>
+        <li>El rango no incluye la fila del encabezado: C2:C13, no C1:C13.</li>
+        <li>SUMA, PROMEDIO, MAX y MIN ignoran el texto y las celdas vacías.</li>
+        <li>Celdas sueltas se separan con punto y coma: =SUMA(E2;E3;E8).</li>
+        <li>En SI y CONTAR.SI, el texto va entre comillas. Los números, no.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-actividades" hidden>
+  <div class="view-head">
+    <h1>Actividades</h1>
+    <p class="lead">Escribí cada fórmula empezando con =. Para insertar una referencia, hacé clic en una celda de la planilla, arrastrá para un rango o tocá la letra de una columna. Lo que escribas se guarda y pasa al Entregable.</p>
+    <div class="progress"><div class="bar"><i id="p-bar"></i></div><span id="p-count" class="mono" style="font-size:.9rem"></span></div>
+  </div>
+  <div class="practice">
+    <div class="list" id="ex-list"></div>
+    <div class="side" id="p-side"></div>
+  </div>
+</section>
+
+<section class="view" id="v-autoevaluacion" hidden>
+  <div class="view-head">
+    <h1>Autoevaluación</h1>
+    <p class="lead">Nueve preguntas de opción múltiple. Elegís una respuesta y la corrección aparece enseguida. Las respuestas pasan al Entregable.</p>
+  </div>
+  <div class="stack">
+    <div class="panel score">
+      <div><span class="mono" id="q-score" style="font-size:1.4rem;font-weight:600"></span><p id="q-msg" style="color:var(--ink-2);font-size:.93rem"></p></div>
+      <button class="btn" id="q-reset" type="button">Empezar de nuevo</button>
+    </div>
+    <div class="list" id="q-list"></div>
+  </div>
+</section>
+
+<section class="view" id="v-entregable" hidden>
+  <div class="view-head noprint">
+    <h1>Entregable</h1>
+    <p class="lead">Esta hoja junta todo lo que hiciste. Completá tus datos, revisá que esté todo y guardala como PDF.</p>
+  </div>
+  <div class="stack">
+    <div class="panel noprint">
+      <h3>Cómo generar el PDF</h3>
+      <div class="steps3" style="margin-top:8px">
+        <div><b>1. Completá tus datos</b>Nombre y apellido, grupo y fecha, en la hoja de abajo.</div>
+        <div><b>2. Tocá «Guardar como PDF»</b>Se abre el cuadro de impresión de tu navegador.</div>
+        <div><b>3. Elegí PDF como destino</b>En «Destino» o «Impresora» elegí «Guardar como PDF» y guardá el archivo. Después subilo a CREA.</div>
+      </div>
+      <p id="e-warn" class="note" style="margin-top:12px" hidden></p>
+      <p style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap"><button class="btn primary" id="e-print" type="button">Guardar como PDF</button><a class="btn ghost" href="#actividades" style="text-decoration:none;display:inline-flex;align-items:center">Volver a las actividades</a></p>
+    </div>
+    <article class="paper" id="paper">
+      <div>
+        <h2>Actividades de recuperación</h2>
+        <p class="sub">Primero EMS · Excel: funciones y rangos · Entrega de tarea</p>
+      </div>
+      <div class="idrow">
+        <label>Nombre y apellido<input id="e-nombre" type="text" autocomplete="name"></label>
+        <label>Grupo<input id="e-grupo" type="text" autocomplete="off"></label>
+        <label>Fecha<input id="e-fecha" type="text" autocomplete="off"></label>
+      </div>
+      <div class="sumline" id="e-sum"></div>
+      <div id="e-body" class="stack" style="gap:18px"></div>
+      <section>
+        <h3>Dudas o cosas que me costaron</h3>
+        <textarea class="fi scr" id="e-dudas" placeholder="Opcional. Podés dejarlo vacío."></textarea>
+        <div class="txtans prt" id="e-dudas-p"></div>
+      </section>
+      <section class="nobreak">
+        <h3>Datos con los que se trabajó</h3>
+        <table class="dt" id="e-data"></table>
+      </section>
+    </article>
+  </div>
+</section>
+
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- datos: cantina del liceo ---------- */
+const DATA=[
+  ['Alfajor','Golosinas',40,35,58],
+  ['Agua mineral','Bebidas',25,45,40],
+  ['Jugo en caja','Bebidas',18,60,33],
+  ['Tostado','Comidas',null,90,27],
+  ['Galletitas','Golosinas',32,40,45],
+  ['Sándwich','Comidas',12,110,21],
+  ['Gaseosa','Bebidas',null,70,50],
+  ['Chocolate','Golosinas',22,55,30],
+  ['Yogur','Bebidas',15,65,19],
+  ['Pizzeta','Comidas',10,85,36],
+  ['Turrón','Golosinas',28,30,24],
+  ['Manzana','Frutas',35,25,17]
+];
+const COLS=['A','B','C','D','E'];
+const HEAD=['Producto','Categoría','Stock (unid.)','Precio ($)','Vendidos (unid.)'];
+const R1=2, R2=13;
+function cellVal(col,row){
+  const ci=COLS.indexOf(col);
+  if(ci<0) return null;
+  if(row===1) return HEAD[ci];
+  if(row<R1||row>R2) return null;
+  const v=DATA[row-R1][ci];
+  return v===undefined?null:v;
+}
+const isBlank=v=>v===null||v===undefined||v==='';
+const isNum=v=>typeof v==='number';
+const fmt=n=>typeof n==='number'?(Number.isInteger(n)?n.toLocaleString('es-UY'):n.toLocaleString('es-UY',{maximumFractionDigits:2})):String(n);
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ---------- motor de fórmulas ---------- */
+const FUNC={SUMA:'SUM',SUM:'SUM',PROMEDIO:'AVERAGE',AVERAGE:'AVERAGE',MAX:'MAX',MIN:'MIN',CONTAR:'COUNT',COUNT:'COUNT',CONTARA:'COUNTA',COUNTA:'COUNTA','CONTAR.BLANCO':'COUNTBLANK',COUNTBLANK:'COUNTBLANK','CONTAR.SI':'COUNTIF',COUNTIF:'COUNTIF',SI:'IF',IF:'IF'};
+function parseRef(s){
+  const m=s.trim().match(/^\$?([A-Za-z])\$?(\d{1,4})$/);
+  if(!m) throw new Error('«'+s.trim()+'» no es una referencia de celda. Se escribe la letra de la columna y el número de la fila, por ejemplo C2.');
+  return {col:m[1].toUpperCase(),row:+m[2]};
+}
+function expand(s){
+  s=s.trim();
+  if(s.indexOf(':')>=0){
+    const p=s.split(':');
+    if(p.length!==2) throw new Error('El rango «'+s+'» está mal escrito. Va de una celda a otra con dos puntos, por ejemplo C2:C13.');
+    const a=parseRef(p[0]), b=parseRef(p[1]);
+    const c1=Math.min(a.col.charCodeAt(0),b.col.charCodeAt(0)), c2=Math.max(a.col.charCodeAt(0),b.col.charCodeAt(0));
+    const r1=Math.min(a.row,b.row), r2=Math.max(a.row,b.row);
+    if((c2-c1+1)*(r2-r1+1)>4000) throw new Error('Ese rango es demasiado grande para esta práctica.');
+    const out=[];
+    for(let c=c1;c<=c2;c++) for(let r=r1;r<=r2;r++) out.push({col:String.fromCharCode(c),row:r});
+    return out;
+  }
+  return [parseRef(s)];
+}
+function splitArgs(str){
+  const out=[]; let cur='', q=false;
+  for(let i=0;i<str.length;i++){
+    const ch=str[i];
+    if(ch==='"'){q=!q; cur+=ch; continue;}
+    if((ch===';'||ch===',')&&!q){out.push(cur); cur=''; continue;}
+    cur+=ch;
+  }
+  out.push(cur);
+  return out.map(x=>x.trim()).filter(x=>x!=='');
+}
+const unq=s=>{s=s.trim(); return (s.length>=2&&s[0]==='"'&&s[s.length-1]==='"')?s.slice(1,-1):null;};
+const CMP=(op,a,b)=>op==='>'?a>b:op==='<'?a<b:op==='>='?a>=b:op==='<='?a<=b:op==='='?a===b:a!==b;
+function evaluate(f){
+  let s=String(f==null?'':f).trim();
+  if(!s) throw new Error('Escribí una fórmula. Empieza con el signo =.');
+  if(s[0]!=='=') throw new Error('Una fórmula empieza con el signo =.');
+  s=s.slice(1).trim();
+  const m=s.match(/^([A-Za-zÁÉÍÓÚáéíóúÑñ.]+)\s*\(([\s\S]*)\)$/);
+  if(!m) throw new Error('Escribila con la forma FUNCIÓN(argumentos), con los paréntesis cerrados.');
+  const fn=FUNC[m[1].toUpperCase()];
+  if(!fn) throw new Error('Excel no reconoce «'+m[1]+'» y mostraría #¿NOMBRE?. Revisá cómo escribiste la función.');
+  const args=splitArgs(m[2]);
+  if(fn==='COUNTIF'){
+    if(args.length!==2) throw new Error('CONTAR.SI lleva dos argumentos: el rango y el criterio.');
+    const cells=expand(args[0]);
+    const raw=args[1].trim();
+    const q=unq(raw);
+    if(q===null&&!/^-?\d+(\.\d+)?$/.test(raw)) throw new Error('El criterio de texto, o con operador, va entre comillas. Por ejemplo "Bebidas" o ">20".');
+    const c=q===null?raw:q;
+    const mm=c.match(/^(>=|<=|<>|>|<|=)?([\s\S]*)$/);
+    const op=mm[1]||'=', rest=mm[2];
+    const num=(rest.trim()!==''&&!isNaN(Number(rest)))?Number(rest):null;
+    let n=0;
+    cells.forEach(ce=>{
+      const v=cellVal(ce.col,ce.row);
+      if(num!==null){
+        if(isNum(v)){ if(CMP(op,v,num)) n++; }
+        else if(op==='<>') n++;
+      } else {
+        if(isBlank(v)){ if(op==='<>'&&rest!=='') n++; return; }
+        const eq=String(v).toLowerCase()===rest.toLowerCase();
+        if(op==='='&&eq) n++;
+        else if(op==='<>'&&!eq) n++;
+      }
+    });
+    return {fn,value:n};
+  }
+  if(fn==='IF'){
+    if(args.length!==3) throw new Error('SI lleva tres argumentos: la condición, el resultado si se cumple y el resultado si no se cumple.');
+    const cm=args[0].match(/^(\$?[A-Za-z]\$?\d{1,4})\s*(>=|<=|<>|>|<|=)\s*([\s\S]+)$/);
+    if(!cm) throw new Error('La condición compara una celda con un valor, por ejemplo C2>=20 o B2="Bebidas".');
+    const ref=parseRef(cm[1]);
+    const left=cellVal(ref.col,ref.row);
+    const rt=cm[3].trim();
+    const rq=unq(rt);
+    let ok;
+    if(rq!==null){
+      ok=CMP(cm[2],String(isBlank(left)?'':left).toLowerCase(),rq.toLowerCase());
+    } else if(/^-?\d+(\.\d+)?$/.test(rt)){
+      const lv=isBlank(left)?0:left;
+      ok=isNum(lv)?CMP(cm[2],lv,Number(rt)):(cm[2]==='<>');
+    } else throw new Error('En la condición, el texto va entre comillas y el número va solo, sin signo $ ni separador de miles.');
+    const pick=a=>{const t=unq(a); if(t!==null) return t; if(/^-?\d+(\.\d+)?$/.test(a.trim())) return Number(a); throw new Error('Los textos que se muestran van entre comillas.');};
+    return {fn,value:pick(ok?args[1]:args[2])};
+  }
+  if(!args.length) throw new Error('Falta indicar el rango.');
+  let cells=[];
+  args.forEach(a=>{cells=cells.concat(expand(a));});
+  const vals=cells.map(c=>cellVal(c.col,c.row));
+  const nums=vals.filter(isNum);
+  switch(fn){
+    case 'SUM': return {fn,value:nums.reduce((a,b)=>a+b,0)};
+    case 'AVERAGE':
+      if(!nums.length) throw new Error('No hay números en ese rango. Excel mostraría #¡DIV/0!.');
+      return {fn,value:Math.round(nums.reduce((a,b)=>a+b,0)/nums.length*100)/100};
+    case 'MAX': return {fn,value:nums.length?Math.max.apply(null,nums):0};
+    case 'MIN': return {fn,value:nums.length?Math.min.apply(null,nums):0};
+    case 'COUNT': return {fn,value:nums.length};
+    case 'COUNTA': return {fn,value:vals.filter(v=>!isBlank(v)).length};
+    case 'COUNTBLANK': return {fn,value:vals.filter(isBlank).length};
+  }
+  throw new Error('Función no disponible en esta práctica.');
+}
+const same=(a,b)=>typeof a==='number'&&typeof b==='number'?Math.abs(a-b)<0.005:String(a).trim().toLowerCase()===String(b).trim().toLowerCase();
+/* copiar una fórmula k filas hacia abajo: mueve las referencias relativas, no las que tienen $ delante del número */
+function shiftFormula(f,k){
+  return String(f).split('"').map((seg,i)=>i%2?seg:seg.replace(/(\$?)([A-Za-z])(\$?)(\d{1,4})/g,(all,d1,c,d2,r)=>d2==='$'?all:d1+c+d2+(+r+k))).join('"');
+}
+function fillVals(f){
+  const out=[];
+  for(let k=0;k<=R2-R1;k++) out.push(evaluate(shiftFormula(f,k)).value);
+  return out;
+}
+
+/* ---------- almacenamiento ---------- */
+const KEY='tutoria-excel-v1';
+const DOC=/[?&]docente(=|&|$)/.test(location.search);
+let S={ans:{},tries:{},quiz:{},check:{},txt:{},id:{}};
+try{const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ---------- utilidades ---------- */
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+function mk(tag,cls,html){const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e;}
+let toastT;
+function toast(msg){const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{t.hidden=true;},2800);}
+function table(host,heads,rows,opts){
+  opts=opts||{};
+  let h='<thead><tr>'+heads.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>';
+  rows.forEach(r=>{h+='<tr>'+r.map((c,i)=>{
+    const lab=' data-label="'+String(heads[i]).replace(/"/g,'&quot;')+'"';
+    if(c&&typeof c==='object'){return '<td class="'+c.k+'"'+lab+'>'+c.t+'</td>';}
+    return '<td'+lab+(i===0&&opts.boldFirst!==false?' style="font-weight:600"':'')+'>'+esc(c)+'</td>';
+  }).join('')+'</tr>';});
+  host.innerHTML=h+'</tbody>';
+}
+const F=t=>({k:'fcell',t:esc(t)});
+const RS=t=>({k:'res',t:esc(t)});
+
+/* ---------- planilla ---------- */
+function buildGrid(host,opts){
+  const d=mk('details','sheet'); d.open=window.innerWidth>1000||opts.open===true;
+  const narrow=window.innerWidth<=640;
+  d.innerHTML='<summary>Planilla: cantina del liceo'+(narrow?' (tocá para abrir)':'')+'</summary><div class="scroll"></div><p class="hintline">Clic en una celda; arrastrá para un rango; tocá la letra de la columna para tomar todos los datos. '+(opts.extraHint||'')+'</p>';
+  const sc=$('.scroll',d);
+  let h='<table class="grid"><thead><tr><th class="rn"></th>'+COLS.map(c=>'<th class="col" data-c="'+c+'" data-col="'+c+'" title="Tomar la columna '+c+', filas '+R1+' a '+R2+'">'+c+'</th>').join('')+'</tr><tr><th class="rn">1</th>'+HEAD.map((x,i)=>'<th data-c="'+COLS[i]+'">'+x+'</th>').join('')+'</tr></thead><tbody>';
+  for(let r=R1;r<=R2;r++){
+    h+='<tr><th class="rn">'+r+'</th>';
+    COLS.forEach(c=>{
+      const v=cellVal(c,r);
+      const cls=isNum(v)?'n':(isBlank(v)?'blank':'');
+      h+='<td data-c="'+c+'" data-r="'+r+'" class="'+cls+'">'+(isBlank(v)?'':esc(v))+'</td>';
+    });
+    h+='</tr>';
+  }
+  sc.innerHTML=h+'</tbody></table>';
+  host.appendChild(d);
+  let start=null, dragging=false;
+  const tds=$$('td',sc);
+  const cellOf=t=>({col:t.dataset.c,row:+t.dataset.r});
+  const clearDrag=()=>tds.forEach(t=>t.classList.remove('drag'));
+  function paintDrag(a,b){
+    clearDrag();
+    const c1=Math.min(a.col.charCodeAt(0),b.col.charCodeAt(0)), c2=Math.max(a.col.charCodeAt(0),b.col.charCodeAt(0));
+    const r1=Math.min(a.row,b.row), r2=Math.max(a.row,b.row);
+    tds.forEach(t=>{const c=t.dataset.c.charCodeAt(0), r=+t.dataset.r; if(c>=c1&&c<=c2&&r>=r1&&r<=r2) t.classList.add('drag');});
+  }
+  sc.addEventListener('mousedown',e=>{
+    const t=e.target.closest('td'); if(!t) return;
+    e.preventDefault(); dragging=true; start=cellOf(t); paintDrag(start,start);
+  });
+  sc.addEventListener('mouseover',e=>{
+    if(!dragging) return; const t=e.target.closest('td'); if(t) paintDrag(start,cellOf(t));
+  });
+  document.addEventListener('mouseup',e=>{
+    if(!dragging) return; dragging=false;
+    const t=e.target.closest&&e.target.closest('td');
+    clearDrag();
+    if(!t||!sc.contains(t)){return;}
+    const end=cellOf(t);
+    if(start.col===end.col&&start.row===end.row) opts.onPick({type:'cell',cell:end,add:e.ctrlKey||e.metaKey});
+    else opts.onPick({type:'block',a:start,b:end});
+  });
+  $$('th.col',sc).forEach(th=>th.addEventListener('click',()=>{
+    opts.onPick({type:'block',a:{col:th.dataset.col,row:R1},b:{col:th.dataset.col,row:R2},header:true});
+  }));
+  return {
+    mark(cells){
+      const set={}; cells.forEach(c=>{set[c.col+c.row]=1;});
+      tds.forEach(t=>t.classList.toggle('sel',!!set[t.dataset.c+t.dataset.r]));
+    },
+    open(){d.open=true;}
+  };
+}
+
+/* ---------- navegación ---------- */
+const VIEWS=['inicio','basico','funciones','actividades','autoevaluacion','entregable'];
+let current='inicio';
+function route(forced){
+  let v=typeof forced==='string'?forced:(location.hash||'').replace('#','');
+  if(VIEWS.indexOf(v)<0) v='inicio';
+  current=v;
+  VIEWS.forEach(n=>{$('#v-'+n).hidden=(n!==v);});
+  $$('#tabs a').forEach(a=>{ if(a.dataset.v===v) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+  const act=$('#tabs a[aria-current]'); if(act&&act.scrollIntoView) try{act.scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  window.scrollTo(0,0);
+  if(v==='inicio') renderHome();
+  if(v==='entregable') renderEntrega();
+}
+window.addEventListener('hashchange',()=>route());
+/* Navegación propia: funciona aunque el visor bloquee el cambio de # en la dirección (vista previa, iframes, algunos celulares). */
+document.addEventListener('click',e=>{
+  const a=e.target.closest&&e.target.closest('a[href^="#"]');
+  if(!a) return;
+  const v=a.getAttribute('href').slice(1);
+  if(VIEWS.indexOf(v)<0) return;
+  e.preventDefault();
+  try{ if(history.replaceState) history.replaceState(null,'','#'+v); else location.hash=v; }catch(err){}
+  route(v);
+});
+
+/* ---------- inicio ---------- */
+function countOk(){return EX.filter((e,i)=>statusOf(i).st==='ok').length;}
+function quizOk(){return Object.keys(S.quiz).filter(k=>S.quiz[k]===QS[k].letra).length;}
+function renderHome(){
+  $('#doc-banner').hidden=!DOC;
+  $('#home-stats').innerHTML=
+    '<div class="stat"><b>'+countOk()+' / '+EX.length+'</b><span>ejercicios de las actividades correctos</span></div>'+
+    '<div class="stat"><b>'+quizOk()+' / '+QS.length+'</b><span>respuestas correctas en la autoevaluación</span></div>';
+}
+let resetArmed=false;
+$('#reset').addEventListener('click',function(){
+  if(!resetArmed){resetArmed=true; this.textContent='Tocá de nuevo para borrar todo'; setTimeout(()=>{resetArmed=false; this.textContent='Borrar mis datos de este equipo';},4000); return;}
+  S={ans:{},tries:{},quiz:{},check:{},txt:{},id:{}}; save(); resetArmed=false; this.textContent='Borrar mis datos de este equipo';
+  renderPractice(); renderQuiz(); renderHome(); toast('Datos borrados de este equipo');
+});
+
+/* ---------- lo básico ---------- */
+const BASICOS=[
+  ['Celda','Cruce de una columna con una fila. Se nombra con la letra y el número.','C7 es la celda de la columna C, fila 7. Nunca 7C.'],
+  ['Rango','Conjunto de celdas. Se escribe con la primera y la última, separadas por dos puntos.','B2:B10 son las celdas de la columna B, de la fila 2 a la 10. A1:C3 es un bloque de 3 filas por 3 columnas.'],
+  ['Rango no contiguo','Celdas sueltas, separadas por punto y coma.','E2;E3;E8 son tres celdas, sin las que están en el medio.'],
+  ['Tipos de dato','Texto (se alinea a la izquierda), número (a la derecha) y lógico (VERDADERO o FALSO).','Un número guardado como texto no entra en SUMA ni en CONTAR.'],
+  ['Fórmula','Cálculo que empieza con el signo =. Puede combinar números, celdas y funciones.','=B2+B3 suma dos celdas. Sin el =, Excel lo toma como texto.'],
+  ['Función','Operación que Excel ya trae programada. Tiene un nombre y recibe datos entre paréntesis.','En =PROMEDIO(B2:B10), PROMEDIO es la función y B2:B10 es el rango sobre el que trabaja.'],
+  ['Argumento','Cada dato que recibe una función. Se separan con punto y coma.','=SI(A1>5;"Sí";"No") tiene tres argumentos.'],
+  ['Autorrelleno','Arrastrar el cuadradito de la esquina inferior derecha de una celda para copiar su fórmula hacia las vecinas.','Al copiar, las referencias se mueven solas. Ver la tabla de abajo.']
+];
+function renderBasicos(){
+  const host=$('#concepts');
+  BASICOS.forEach(b=>{
+    const dl=mk('dl','concept'); dl.style.margin=0;
+    dl.innerHTML='<dt></dt><dd></dd><dd class="rec"></dd>';
+    dl.children[0].textContent=b[0]; dl.children[1].textContent=b[1]; dl.children[2].textContent=b[2];
+    host.appendChild(dl);
+  });
+  const vals=[10,20,30,40,50];
+  const mini=$('#mini'); let h='<tbody><tr><th class="rn"></th><th>B</th></tr>';
+  vals.forEach((v,i)=>{h+='<tr><th class="rn">'+(i+1)+'</th><td data-r="'+(i+1)+'">'+v+'</td></tr>';});
+  mini.innerHTML=h+'</tbody>';
+  let fn='SUMA', a=1, b=5, anchor=null, drag=false, moved=false, from=null;
+  const fns=['SUMA','PROMEDIO','MAX','MIN','CONTAR'];
+  const chips=$('#mini-fn');
+  fns.forEach(f=>{const bt=mk('button','btn chip',f); bt.type='button'; bt.addEventListener('click',()=>{fn=f; paint();}); chips.appendChild(bt);});
+  function paint(){
+    const lo=Math.min(a,b), hi=Math.max(a,b);
+    $$('td',mini).forEach(td=>td.classList.toggle('sel',+td.dataset.r>=lo&&+td.dataset.r<=hi));
+    const nums=vals.slice(lo-1,hi);
+    const rng=lo===hi?'B'+lo:'B'+lo+':B'+hi;
+    let r;
+    if(fn==='SUMA') r=nums.reduce((x,y)=>x+y,0);
+    else if(fn==='PROMEDIO') r=nums.reduce((x,y)=>x+y,0)/nums.length;
+    else if(fn==='MAX') r=Math.max.apply(null,nums);
+    else if(fn==='MIN') r=Math.min.apply(null,nums);
+    else r=nums.length;
+    $('#mini-f').textContent='='+fn+'('+rng+')';
+    $('#mini-r').textContent=fmt(r);
+    $('#mini-s').textContent=nums.length+(nums.length===1?' celda':' celdas')+' en el rango';
+    $$('.chip',chips).forEach(c=>c.setAttribute('aria-pressed',c.textContent===fn?'true':'false'));
+  }
+  mini.addEventListener('mousedown',e=>{const t=e.target.closest('td'); if(!t) return; e.preventDefault(); drag=true; moved=false; from=+t.dataset.r;});
+  mini.addEventListener('mouseover',e=>{if(!drag) return; const t=e.target.closest('td'); if(!t) return; const r=+t.dataset.r; if(r!==from){moved=true; a=from; b=r; paint();}});
+  document.addEventListener('mouseup',e=>{
+    if(!drag) return; drag=false;
+    const t=e.target.closest&&e.target.closest('td'); if(!t||!mini.contains(t)) return;
+    const r=+t.dataset.r;
+    if(!moved){
+      if(anchor!==null&&anchor!==r){a=anchor; b=r; anchor=null;}
+      else {a=r; b=r; anchor=r;}
+      paint();
+    } else anchor=null;
+  });
+  paint();
+  table($('#t-ref'),['Tipo','Cómo se escribe','Qué pasa al copiar hacia abajo','Ejemplo'],[
+    ['Relativa',F('C2'),'Se mueve: baja una fila por cada fila que copies.','=SI(C2>=20;"Alta";"Baja") en la fila 3 pasa a =SI(C3>=20;"Alta";"Baja")'],
+    ['Absoluta',F('$C$2'),'No se mueve nunca. El signo $ la fija.','=C3*$G$1 en la fila 3 pasa a =C4*$G$1 en la fila 4']
+  ]);
+  const cmp=[['>','Mayor que','=8>5','VERDADERO'],['<','Menor que','=8<5','FALSO'],['>=','Mayor o igual que','=8>=8','VERDADERO'],['<=','Menor o igual que','=8<=5','FALSO'],['=','Igual a','=8=8','VERDADERO'],['<>','Distinto de','=8<>5','VERDADERO']];
+  table($('#t-cmp'),['Operador','Significa','Cómo se escribe','Resultado'],cmp.map(o=>[o[0],o[1],F(o[2]),RS(o[3])]));
+  table($('#t-err'),['Mensaje','Cuándo aparece','Ejemplo','Cómo se arregla'],[
+    ['#¡DIV/0!','Se divide por cero o por una celda vacía.',F('=A1/B1  con B1 vacía'),'Revisar el divisor.'],
+    ['#¿NOMBRE?','Excel no reconoce el nombre de una función.',F('=SUMAA(B2:B10)'),'Corregir cómo está escrito el nombre. También aparece si falta una comilla en un texto.'],
+    ['#¡VALOR!','Una operación recibe un dato que no puede usar.',F('=A1+B1  con texto en A1'),'Revisar que las celdas tengan números y no texto.'],
+    ['#¡REF!','La fórmula apunta a una celda que ya no existe.',F('=B2+C2  después de borrar la columna C'),'Deshacer con Ctrl+Z o volver a escribir la referencia.']
+  ]);
+}
+
+/* ---------- funciones ---------- */
+const FNS=[
+  {n:'SUMA',d:'Suma los números del rango. Ignora las celdas vacías y el texto.',syn:'=SUMA(rango)',ex:'=SUMA(C2:C13)',def:{a:'C2',b:'C13'}},
+  {n:'PROMEDIO',d:'Suma los números y divide por la cantidad de celdas con número. Las vacías y el texto no cuentan, ni en la suma ni en la división.',syn:'=PROMEDIO(rango)',ex:'=PROMEDIO(E2:E13)',def:{a:'E2',b:'E13'}},
+  {n:'MAX',d:'Devuelve el número más grande del rango.',syn:'=MAX(rango)',ex:'=MAX(D2:D13)',def:{a:'D2',b:'D13'}},
+  {n:'MIN',d:'Devuelve el número más chico del rango.',syn:'=MIN(rango)',ex:'=MIN(E2:E13)',def:{a:'E2',b:'E13'}},
+  {n:'CONTAR',d:'Cuenta las celdas que tienen un número.',syn:'=CONTAR(rango)',ex:'=CONTAR(E2:E13)',def:{a:'E2',b:'E13'}},
+  {n:'CONTARA',d:'Cuenta las celdas que tienen algo: número, texto o lo que sea. No cuenta las vacías.',syn:'=CONTARA(rango)',ex:'=CONTARA(B2:B13)',def:{a:'B2',b:'B13'}},
+  {n:'CONTAR.BLANCO',d:'Cuenta las celdas vacías.',syn:'=CONTAR.BLANCO(rango)',ex:'=CONTAR.BLANCO(C2:C7)',def:{a:'C2',b:'C7'}},
+  {n:'CONTAR.SI',d:'Cuenta las celdas del rango que cumplen una condición. El criterio con texto u operador va entre comillas.',syn:'=CONTAR.SI(rango;criterio)',ex:'=CONTAR.SI(B2:B13;"Golosinas")',def:{a:'B2',b:'B13'}},
+  {n:'SI',d:'Muestra un resultado si la condición se cumple y otro si no. Trabaja sobre una celda, no sobre un rango: usa la primera celda que selecciones.',syn:'=SI(condición;si_verdadero;si_falso)',ex:'=SI(E2>=50;"Muy vendido";"Normal")',def:{a:'E2',b:'E2'}}
+];
+const lab={fn:'SUMA',sel:null,multi:false,crit:'Golosinas',op:'>=',val:'50',t:'Muy vendido',f:'Normal'};
+function selCells(sel){
+  if(sel.k==='list') return sel.cells.slice();
+  return expand(sel.a===sel.b?sel.a:sel.a+':'+sel.b);
+}
+function selRef(sel){
+  if(sel.k==='list') return sel.cells.map(c=>c.col+c.row).join(';');
+  return sel.a===sel.b?sel.a:sel.a+':'+sel.b;
+}
+const quote=s=>/^-?\d+(\.\d+)?$/.test(s.trim())?s.trim():'"'+s.replace(/"/g,'')+'"';
+let labGrid;
+function labBuildFormula(){
+  const refs=selRef(lab.sel);
+  if(lab.fn==='CONTAR.SI') return '=CONTAR.SI('+refs+';'+quote(lab.crit)+')';
+  if(lab.fn==='SI'){
+    const c=selCells(lab.sel)[0];
+    return '=SI('+c.col+c.row+lab.op+quote(lab.val)+';'+quote(lab.t)+';'+quote(lab.f)+')';
+  }
+  return '='+lab.fn+'('+refs+')';
+}
+function labRender(){
+  const f=FNS.find(x=>x.n===lab.fn);
+  $$('#lab-fn .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.n===lab.fn?'true':'false'));
+  $('#lab-desc').textContent=f.d;
+  const ex=$('#lab-extra'); ex.innerHTML='';
+  if(lab.fn==='CONTAR.SI'){
+    ex.innerHTML='<label>Criterio<input type="text" id="lx-crit" style="width:170px" autocomplete="off" spellcheck="false"></label><span style="font-size:.85rem;color:var(--ink-2);align-self:center">Probá Golosinas, &gt;30 o &lt;&gt;Bebidas. Las comillas se agregan solas.</span>';
+    $('#lx-crit').value=lab.crit;
+    $('#lx-crit').addEventListener('input',e=>{lab.crit=e.target.value; labOut();});
+  } else if(lab.fn==='SI'){
+    ex.innerHTML='<label>Operador<select id="lx-op">'+['>=','>','<=','<','=','<>'].map(o=>'<option'+(o===lab.op?' selected':'')+'>'+o.replace('<','&lt;').replace('>','&gt;')+'</option>').join('')+'</select></label>'+
+      '<label>Valor<input type="text" id="lx-val" style="width:110px" autocomplete="off"></label>'+
+      '<label>Si se cumple<input type="text" id="lx-t" style="width:120px" autocomplete="off"></label>'+
+      '<label>Si no se cumple<input type="text" id="lx-f" style="width:120px" autocomplete="off"></label>';
+    $('#lx-val').value=lab.val; $('#lx-t').value=lab.t; $('#lx-f').value=lab.f;
+    $('#lx-op').addEventListener('change',e=>{lab.op=e.target.value; labOut();});
+    $('#lx-val').addEventListener('input',e=>{lab.val=e.target.value; labOut();});
+    $('#lx-t').addEventListener('input',e=>{lab.t=e.target.value; labOut();});
+    $('#lx-f').addEventListener('input',e=>{lab.f=e.target.value; labOut();});
+  }
+  labOut();
+}
+function labOut(){
+  const cells=selCells(lab.sel);
+  labGrid.mark(lab.fn==='SI'?cells.slice(0,1):cells);
+  const f=labBuildFormula();
+  $('#lab-f').textContent=f;
+  const box=$('#lab-res');
+  try{
+    const r=evaluate(f);
+    box.classList.remove('err');
+    $('#lab-r').textContent=fmt(r.value);
+    $('#lab-s').textContent=lab.fn==='SI'?'resultado para la celda '+cells[0].col+cells[0].row:'resultado';
+  }catch(e){box.classList.add('err'); $('#lab-r').textContent=e.message; $('#lab-s').textContent='';}
+  const v=cells.map(c=>cellVal(c.col,c.row));
+  const n=v.filter(isNum).length, bl=v.filter(isBlank).length, tx=v.length-n-bl;
+  $('#lab-stats').textContent=lab.fn==='SI'
+    ? 'Celda usada: '+cells[0].col+cells[0].row+' ('+(isBlank(v[0])?'vacía':isNum(v[0])?'número '+fmt(v[0]):'texto «'+v[0]+'»')+').'
+    : 'Selección: '+v.length+(v.length===1?' celda':' celdas')+' · '+n+(n===1?' número':' números')+' · '+tx+(tx===1?' texto':' textos')+' · '+bl+(bl===1?' vacía':' vacías')+'.';
+}
+function labPick(p){
+  if(p.type==='block'){
+    const A=parseRef(p.a.col+p.a.row),B=parseRef(p.b.col+p.b.row);
+    const lo={col:String.fromCharCode(Math.min(A.col.charCodeAt(0),B.col.charCodeAt(0))),row:Math.min(A.row,B.row)};
+    const hi={col:String.fromCharCode(Math.max(A.col.charCodeAt(0),B.col.charCodeAt(0))),row:Math.max(A.row,B.row)};
+    lab.sel={k:'block',a:lo.col+lo.row,b:hi.col+hi.row};
+  } else {
+    const c=p.cell;
+    if(p.add||lab.multi){
+      let list=lab.sel.k==='list'?lab.sel.cells.slice():[];
+      const i=list.findIndex(x=>x.col===c.col&&x.row===c.row);
+      if(i>=0) list.splice(i,1); else list.push(c);
+      if(!list.length) list=[c];
+      lab.sel={k:'list',cells:list};
+    } else lab.sel={k:'block',a:c.col+c.row,b:c.col+c.row};
+  }
+  labOut();
+}
+function renderFunciones(){
+  const chips=$('#lab-fn');
+  FNS.forEach(f=>{
+    const b=mk('button','btn chip',f.n); b.type='button'; b.dataset.n=f.n;
+    b.addEventListener('click',()=>{lab.fn=f.n; lab.sel={k:'block',a:f.def.a,b:f.def.b}; $('#lab-multi').checked=false; lab.multi=false; labRender();});
+    chips.appendChild(b);
+  });
+  labGrid=buildGrid($('#lab-grid'),{onPick:labPick,open:true,extraHint:'Ctrl o Cmd + clic suma celdas sueltas.'});
+  $('#lab-multi').addEventListener('change',e=>{lab.multi=e.target.checked;});
+  lab.sel={k:'block',a:'C2',b:'C13'};
+  labRender();
+  table($('#t-fn'),['Función','Para qué sirve','Cómo se escribe','Ejemplo sobre la planilla','Resultado'],FNS.map(f=>[f.n,f.d,F(f.syn),F(f.ex),RS(fmt(evaluate(f.ex).value))]));
+  const cols=[['A','Producto (todo texto)'],['C','Stock (números y 2 vacías)'],['E','Vendidos (todo números)']];
+  table($('#t-count'),['Función'].concat(cols.map(c=>'Columna '+c[0]+': '+c[1])),['CONTAR','CONTARA','CONTAR.BLANCO'].map(n=>[n].concat(cols.map(c=>RS(evaluate('='+n+'('+c[0]+'2:'+c[0]+'13)').value)))));
+  table($('#t-crit'),['Condición','En CONTAR.SI (criterio)','En SI (prueba lógica)','Para recordar'],[
+    ['Igual a un texto',F('"Bebidas"'),F('B2="Bebidas"'),'El texto va siempre entre comillas.'],
+    ['Igual a un número',F('40'),F('C2=40'),'El número va sin comillas.'],
+    ['Mayor que',F('">20"'),F('C2>20'),'En CONTAR.SI, el operador va dentro de las comillas, pegado al número.'],
+    ['Mayor o igual',F('">=20"'),F('C2>=20'),'Es >=, no =>.'],
+    ['Menor que',F('"<30"'),F('D2<30'),''],
+    ['Distinto de',F('"<>Bebidas"'),F('B2<>"Bebidas"'),'El texto del criterio va pegado al operador.']
+  ]);
+}
+
+/* ---------- actividades ---------- */
+const ACT=[
+  {t:'Actividad 1. Sumar, promediar y buscar extremos',p:'Funciones que trabajan con los números de un rango: SUMA, PROMEDIO, MAX y MIN.',items:[
+    {q:'Calculá cuántas unidades se vendieron en total (columna Vendidos).',s:'=SUMA(E2:E13)',h:'Se suman números de una sola columna. El rango no incluye el encabezado.',w:'SUMA sobre la columna Vendidos, de la fila 2 a la 13.'},
+    {q:'Calculá el precio promedio de los productos.',s:'=PROMEDIO(D2:D13)',h:'Mismo tipo de rango que el ejercicio anterior, pero en la columna Precio y con otra función.',w:'PROMEDIO sobre la columna Precio (D2:D13).'},
+    {q:'Averiguá cuál es el stock más alto.',s:'=MAX(C2:C13)',h:'Buscás el valor más grande de una columna. Hay celdas vacías: la función las ignora.',w:'MAX sobre la columna Stock (C2:C13). Las celdas vacías no cuentan.'},
+    {q:'Averiguá cuál es el precio más bajo.',s:'=MIN(D2:D13)',h:'Es el extremo contrario al del ejercicio anterior, sobre la columna Precio.',w:'MIN sobre la columna Precio (D2:D13).'},
+    {q:'Sumá las unidades vendidas del Alfajor, el Agua mineral y la Gaseosa (filas 2, 3 y 8), que no están una al lado de la otra.',s:'=SUMA(E2;E3;E8)',h:'Son tres celdas separadas. Escribilas una por una, con punto y coma, o tocalas con Ctrl.',w:'Rango no contiguo: cada celda va por separado, con punto y coma. Con dos puntos se sumarían también las filas del medio.'}
+  ]},
+  {t:'Actividad 2. Contar',p:'Las cuatro funciones de contar, todas en el mismo ejercicio. Fijate qué mira cada una: números, cualquier contenido, celdas vacías o celdas que cumplen una condición.',items:[
+    {q:'Contá cuántos productos hay en la lista (columna Producto).',s:'=CONTARA(A2:A13)',h:'Los nombres son texto. ¿Qué función cuenta cualquier contenido?',w:'Los nombres son texto, así que hace falta la función que cuenta cualquier contenido: CONTARA.'},
+    {q:'Contá cuántos productos tienen el stock cargado con un número.',s:'=CONTAR(C2:C13)',h:'Pensá qué cuenta CONTAR y qué hay en la columna Stock.',w:'CONTAR cuenta solo las celdas con número. Las dos celdas vacías no entran.'},
+    {q:'Contá cuántos productos tienen el stock sin cargar (celda vacía).',s:'=CONTAR.BLANCO(C2:C13)',h:'Ahora interesan las celdas vacías.',w:'CONTAR.BLANCO cuenta las celdas vacías.'},
+    {q:'Contá cuántos productos son de la categoría Bebidas.',s:'=CONTAR.SI(B2:B13;"Bebidas")',h:'Se cuenta con una condición sobre texto. El texto va entre comillas.',w:'CONTAR.SI con el rango Categoría y el criterio entre comillas.'},
+    {q:'Contá cuántos productos tienen más de 20 unidades en stock.',s:'=CONTAR.SI(C2:C13;">20")',h:'La condición lleva un operador. Va dentro de las comillas, pegado al número.',w:'Con un operador, el criterio entero va entre comillas: ">20".'}
+  ],refl:{id:'r1',q:'Los resultados de los ejercicios 2b y 2c suman lo mismo que el de 2a. ¿Por qué pasa eso? Explicalo con tus palabras.'}},
+  {t:'Actividad 3. La función SI',p:'Escribí la fórmula en la fila 2 y después imaginá que la arrastrás hasta la fila 13. Al verificar, vas a ver qué da en cada fila.',items:[
+    {fill:true,q:'En la celda F2, mostrá "Alta" si el stock del Alfajor (C2) es 20 o más, y "Baja" si es menor.',s:'=SI(C2>=20;"Alta";"Baja")',h:'La condición compara C2 con un número, sin comillas. Los dos resultados son textos y van entre comillas.',w:'La condición usa >= sobre un número. Al copiarla hacia abajo, C2 pasa a C3, C4... y cada fila usa su propio stock.'},
+    {fill:true,q:'En la celda G2, mostrá "Caro" si el precio del Alfajor (D2) es mayor a 50, y "Barato" si no.',s:'=SI(D2>50;"Caro";"Barato")',h:'Es la misma estructura del ejercicio anterior, con la columna Precio y el operador >.',w:'Con > estricto, un precio de exactamente 50 daría "Barato".'}
+  ],refl:{id:'r2',q:'Mirá las filas de Tostado y Gaseosa, que tienen el stock vacío. ¿Qué muestra tu fórmula 3a en esas filas? ¿Te parece que es la mejor respuesta? Explicá por qué.'}}
+];
+const EX=[];
+ACT.forEach((a,ai)=>a.items.forEach((it,ii)=>{
+  it.act=ai+1; it.id=(ai+1)+'abcde'[ii];
+  it.exp=it.fill?null:evaluate(it.s);
+  it.expRows=it.fill?fillVals(it.s):null;
+  EX.push(it);
+}));
+let pGrid, activeInp=null;
+
+/* estado de un ejercicio, a partir de lo escrito (sirve para pantalla y para el entregable) */
+function statusOf(i){
+  const ex=EX[i], a=(S.ans[i]||'').trim();
+  if(!a) return {st:'none',txt:'Sin responder',res:'—',err:null};
+  let r;
+  try{r=evaluate(a);}catch(e){return {st:'bad',txt:'Revisar',res:'Fórmula con error',err:e.message};}
+  if(ex.fill){
+    let vals;
+    try{vals=fillVals(a);}catch(e){return {st:'bad',txt:'Revisar',res:'Fórmula con error',err:e.message};}
+    const okAll=r.fn==='IF'&&vals.every((v,k)=>same(v,ex.expRows[k]));
+    const cnt={}; vals.forEach(v=>{cnt[v]=(cnt[v]||0)+1;});
+    const sum=Object.keys(cnt).map(k=>k+': '+cnt[k]).join(', ');
+    return {st:okAll?'ok':'bad',txt:okAll?'Correcta':'Revisar',res:fmt(r.value)+' en la fila 2. Copiada hasta la fila 13: '+sum,vals:vals,fn:r.fn,err:null};
+  }
+  const okV=same(r.value,ex.exp.value), okF=r.fn===ex.exp.fn;
+  return {st:(okV&&okF)?'ok':'bad',txt:(okV&&okF)?'Correcta':'Revisar',res:fmt(r.value),value:r.value,okV:okV,okF:okF,err:null};
+}
+function updateProgress(){
+  const dn=countOk();
+  $('#p-bar').style.width=(dn/EX.length*100)+'%';
+  $('#p-count').textContent=dn+' de '+EX.length+' correctos';
+}
+function refHighlight(){
+  if(!pGrid) return;
+  const cells=[];
+  if(activeInp){
+    (activeInp.value.match(/\$?[A-Za-z]\$?\d{1,4}(:\$?[A-Za-z]\$?\d{1,4})?/g)||[]).forEach(t=>{try{expand(t.replace(/\$/g,'')).forEach(c=>cells.push(c));}catch(e){}});
+  }
+  pGrid.mark(cells);
+}
+function insertRef(text,add){
+  if(!activeInp){toast('Primero hacé clic en el campo de un ejercicio.'); return;}
+  const inp=activeInp, s=inp.selectionStart==null?inp.value.length:inp.selectionStart, e=inp.selectionEnd==null?s:inp.selectionEnd;
+  const before=inp.value.slice(0,s), after=inp.value.slice(e);
+  let ins=text;
+  if(add&&before&&!/[(;,]$/.test(before)) ins=';'+text;
+  inp.value=before+ins+after;
+  const pos=before.length+ins.length;
+  inp.focus(); inp.setSelectionRange(pos,pos);
+  S.ans[inp.dataset.i]=inp.value; save();
+  refHighlight();
+}
+function setFb(card,cls,msg){const fb=$('.fb',card); fb.className='fb '+cls; fb.textContent=msg;}
+function fillTable(card,a){
+  const old=$('.fill',card); if(old) old.remove();
+  let vals; try{vals=fillVals(a);}catch(e){return;}
+  let h='<summary>Ver qué pasa al copiar la fórmula hacia abajo</summary><table class="fl"><thead><tr><th style="width:24%">Producto</th><th style="width:48%">Fórmula en esa fila</th><th>Resultado</th></tr></thead><tbody>';
+  for(let k=0;k<=R2-R1;k++){
+    const row=R1+k;
+    h+='<tr><td>'+esc(cellVal('A',row))+'</td><td class="f">'+esc(shiftFormula(a,k))+'</td><td>'+esc(vals[k])+'</td></tr>';
+  }
+  const d=mk('details','fill',h+'</tbody></table>');
+  card.appendChild(d);
+}
+function verify(i){
+  const card=$('#ex-'+i), inp=$('input',card), ex=EX[i];
+  S.ans[i]=inp.value; save();
+  const st=statusOf(i);
+  const a=inp.value.trim();
+  if(st.st==='none'){ setFb(card,'bad','Escribí una fórmula. Empieza con el signo =.'); return; }
+  if(st.err){ setFb(card,'bad',st.err); S.tries[i]=(S.tries[i]||0)+1; save(); updateProgress(); return; }
+  card.classList.toggle('done',st.st==='ok');
+  if(st.st==='ok'){
+    const hdr=!ex.fill&&/\$?[A-Za-z]\$?1(?!\d)/.test(a)?' Ojo: tu rango incluye el encabezado (fila 1). Acá no cambia el resultado porque es texto, pero conviene empezar en la fila 2.':'';
+    setFb(card,'ok',ex.fill?'Correcta. En la fila 2 da '+fmt(evaluate(a).value)+', y copiada hasta la fila 13 da lo esperado en todas las filas.':'Correcta. Da '+fmt(ex.exp.value)+'.'+hdr);
+  } else {
+    S.tries[i]=(S.tries[i]||0)+1;
+    if(ex.fill){
+      const bad=(st.vals||[]).filter((v,k)=>!same(v,ex.expRows[k])).length;
+      setFb(card,'bad',st.fn!=='IF'?'Este ejercicio pide la función SI.':'La fórmula calcula, pero copiada hacia abajo falla en '+bad+(bad===1?' fila':' filas')+'. Revisá la celda, el operador y el valor de la condición.'+(S.tries[i]>=2?' Pista: '+ex.h:''));
+    } else if(st.okV&&!st.okF){
+      setFb(card,'bad','El resultado coincide, pero el ejercicio pide otra función. Releé la consigna.');
+    } else {
+      setFb(card,'bad','Todavía no. Revisá la función y el rango.'+(S.tries[i]>=2?' Pista: '+ex.h:''));
+    }
+    save();
+  }
+  if(ex.fill) fillTable(card,a);
+  save(); updateProgress();
+}
+function renderPractice(){
+  const host=$('#ex-list'); host.innerHTML='';
+  let n=0;
+  ACT.forEach((act,ai)=>{
+    const h=mk('div','act-h'); h.innerHTML='<h2></h2><p></p>'; $('h2',h).textContent=act.t; $('p',h).textContent=act.p;
+    host.appendChild(h);
+    act.items.forEach(ex=>{
+      const i=n++;
+      const card=mk('article','ex'); card.id='ex-'+i;
+      card.innerHTML='<div class="ex-head"><span class="ex-n">'+ex.id.slice(1)+'</span><p></p></div>'+
+        '<div class="ex-row"><input class="fi" id="in-'+i+'" data-i="'+i+'" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="=FUNCIÓN(rango)" aria-label="Fórmula del ejercicio '+ex.id+'">'+
+        '<button class="btn primary" type="button" data-a="v">Verificar</button><button class="btn ghost" type="button" data-a="s">Ver solución</button></div>'+
+        '<p class="fb info" role="status" aria-live="polite"></p><div class="sol" hidden><span>Fórmula: <code></code></span><span class="why"></span></div>';
+      $('.ex-head p',card).textContent=ex.q;
+      $('code',card).textContent=ex.s; $('.why',card).textContent=ex.w;
+      const inp=$('input',card); inp.value=S.ans[i]||'';
+      inp.addEventListener('focus',()=>{activeInp=inp; refHighlight();});
+      inp.addEventListener('input',()=>{S.ans[i]=inp.value; save(); refHighlight();});
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); verify(i);}});
+      $('[data-a=v]',card).addEventListener('click',()=>verify(i));
+      $('[data-a=s]',card).addEventListener('click',function(){const s=$('.sol',card); s.hidden=!s.hidden; this.textContent=s.hidden?'Ver solución':'Ocultar solución';});
+      const st=statusOf(i);
+      if(st.st==='ok'){card.classList.add('done'); setFb(card,'ok',ex.fill?'Correcta.':'Correcta. Da '+fmt(ex.exp.value)+'.'); if(ex.fill) fillTable(card,inp.value.trim());}
+      host.appendChild(card);
+    });
+    if(act.refl){
+      const r=mk('div','refl'); r.innerHTML='<label for="'+act.refl.id+'"></label><textarea class="fi" id="'+act.refl.id+'" placeholder="Escribí tu respuesta acá"></textarea>';
+      $('label',r).textContent='Reflexión. '+act.refl.q;
+      const ta=$('textarea',r); ta.value=S.txt[act.refl.id]||'';
+      ta.addEventListener('input',()=>{S.txt[act.refl.id]=ta.value; save();});
+      host.appendChild(r);
+    }
+  });
+  updateProgress();
+}
+
+/* ---------- autoevaluación ---------- */
+const RAW=[
+  ['¿Cómo se llama la celda que está en la columna C, fila 7?','C7','7C','C-7','Primero va la letra de la columna y después el número de la fila.'],
+  ['¿Qué indica el rango B2:B10?','Todas las celdas desde B2 hasta B10','Solo las celdas B2 y B10','La suma de B2 y B10','Los dos puntos significan «desde ... hasta».'],
+  ['Se escribe =B6*$B$2 y se copia hacia abajo. ¿Qué pasa con $B$2?','Queda fija: siempre apunta a B2','Cambia a $B$3, $B$4...','Se transforma en un error #¡REF!','El signo $ bloquea la columna y la fila. B6 es relativa y sí cambia a B7, B8...'],
+  ['Las celdas A1 a A4 contienen: A1 vacía, A2 = 5, A3 = el texto hola, A4 = 7. ¿Qué da =SUMA(A1:A4)?','12','#¡VALOR!','4','Dentro de un rango, SUMA ignora el texto y las celdas vacías. Suma 5 + 7.'],
+  ['Con los mismos datos, ¿qué da =CONTAR(A1:A4)?','2','3','4','CONTAR solo cuenta números: el 5 y el 7.'],
+  ['Con los mismos datos, ¿qué da =CONTARA(A1:A4)?','3','2','4','CONTARA cuenta las celdas que tienen algo: el 5, el texto y el 7. La vacía no.'],
+  ['¿Qué hace =CONTAR.SI(C2:C13;">=20")?','Cuenta cuántas celdas del rango valen 20 o más','Suma los valores que son 20 o más','Cuenta las celdas que contienen exactamente el texto >=20','CONTAR.SI cuenta. El operador y el número van juntos dentro de las comillas.'],
+  ['Si A1 vale 5, ¿qué muestra =SI(A1>=6;"Cumple";"No cumple")?','No cumple','Cumple','5','5 >= 6 es falso, así que se muestra el tercer argumento.'],
+  ['¿Para qué sirve la función SI?','Para mostrar un resultado u otro según se cumpla o no una condición','Para contar las celdas que cumplen una condición','Para sumar las celdas de un rango','Contar con condición es CONTAR.SI. SI no cuenta ni suma: elige entre dos resultados.']
+];
+const POS=[1,0,2,1,0,2,1,0,2];
+const QS=RAW.map((r,i)=>{const o=[r[2],r[3]]; o.splice(POS[i],0,r[1]); return {q:r[0],o:o,letra:'ABC'[POS[i]],w:r[4]};});
+function quizScore(){
+  const ans=Object.keys(S.quiz).length, ok=quizOk();
+  $('#q-score').textContent=ok+' de '+QS.length+' correctas';
+  $('#q-msg').textContent=ans<QS.length?'Respondidas: '+ans+' de '+QS.length+'.':(ok>=7?'Muy bien.':'Con menos de 7, conviene volver a Lo básico y a Funciones y probar de nuevo.');
+}
+function renderQuiz(){
+  const host=$('#q-list'); host.innerHTML='';
+  QS.forEach((q,i)=>{
+    const card=mk('article','q'); card.id='q-'+i;
+    card.innerHTML='<div class="qt"><span class="ex-n">'+(i+1)+'</span><p></p></div><div class="opts"></div><div class="expl" hidden></div>';
+    $('.qt p',card).textContent=q.q;
+    const opts=$('.opts',card);
+    q.o.forEach((t,j)=>{
+      const b=mk('button','opt'); b.type='button'; b.dataset.l='ABC'[j];
+      b.innerHTML='<b>'+'ABC'[j]+'</b><span></span>'; $('span',b).textContent=t;
+      b.addEventListener('click',()=>{S.quiz[i]='ABC'[j]; save(); paintQ(i); quizScore();});
+      opts.appendChild(b);
+    });
+    host.appendChild(card); paintQ(i);
+  });
+  quizScore();
+}
+function paintQ(i){
+  const card=$('#q-'+i), a=S.quiz[i], q=QS[i];
+  if(!a) return;
+  $$('.opt',card).forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.l===q.letra) b.classList.add('right');
+    else if(b.dataset.l===a) b.classList.add('wrong');
+  });
+  const e=$('.expl',card); e.hidden=false;
+  e.innerHTML='<strong></strong> <span></span>';
+  $('strong',e).textContent=a===q.letra?'Correcta.':'Incorrecta. La respuesta es la '+q.letra+'.';
+  $('span',e).textContent=q.w;
+}
+$('#q-reset').addEventListener('click',()=>{S.quiz={}; save(); renderQuiz(); window.scrollTo(0,0);});
+
+/* ---------- entregable ---------- */
+function txtBox(v){
+  return '<div class="txtans'+(v&&v.trim()?'':' empty')+'">'+(v&&v.trim()?esc(v):'(Sin respuesta)')+'</div>';
+}
+function renderEntrega(){
+  const today=new Date().toLocaleDateString('es-UY');
+  if(!S.id.fecha){S.id.fecha=today; save();}
+  $('#e-nombre').value=S.id.nombre||''; $('#e-grupo').value=S.id.grupo||''; $('#e-fecha').value=S.id.fecha||'';
+  const ok=countOk(), qo=quizOk(), qa=Object.keys(S.quiz).length;
+  $('#e-sum').innerHTML='<span>Actividades: '+ok+' de '+EX.length+' correctas</span><span>Autoevaluación: '+qo+' de '+QS.length+' correctas</span>';
+  const sinResp=EX.filter((e,i)=>statusOf(i).st==='none').length;
+  const w=$('#e-warn'), msgs=[];
+  if(sinResp) msgs.push('Tenés '+sinResp+(sinResp===1?' ejercicio':' ejercicios')+' sin responder.');
+  if(qa<QS.length) msgs.push('Te faltan '+(QS.length-qa)+(QS.length-qa===1?' pregunta':' preguntas')+' de la autoevaluación.');
+  w.hidden=!msgs.length; w.textContent=msgs.join(' ')+(msgs.length?' Podés generar el PDF igual, pero conviene completar antes.':'');
+  let h='';
+  let n=0;
+  ACT.forEach((act,ai)=>{
+    h+='<section><h3>'+esc(act.t)+'</h3><table class="dt stk"><thead><tr><th style="width:6%">Ej.</th><th style="width:'+(DOC?'22%':'27%')+'">Consigna</th><th style="width:'+(DOC?'22%':'30%')+'">Tu fórmula</th>'+(DOC?'<th style="width:22%">Fórmula esperada</th>':'')+'<th>Resultado</th><th style="width:12%">Control</th></tr></thead><tbody>';
+    act.items.forEach(ex=>{
+      const i=n++, st=statusOf(i);
+      h+='<tr><td data-label="Ej.">'+ex.id+'</td><td data-label="Consigna">'+esc(ex.q)+'</td><td class="f" data-label="Tu fórmula">'+(S.ans[i]&&S.ans[i].trim()?esc(S.ans[i].trim()):'—')+'</td>'+(DOC?'<td class="f" data-label="Fórmula esperada">'+esc(ex.s)+'</td>':'')+'<td data-label="Resultado">'+esc(st.res)+'</td><td class="st '+st.st+'" data-label="Control">'+(st.st==='ok'?'✔ ':st.st==='bad'?'✘ ':'')+st.txt+'</td></tr>';
+    });
+    h+='</tbody></table>';
+    if(act.refl) h+='<p style="margin:10px 0 4px"><b>Reflexión.</b> '+esc(act.refl.q)+'</p>'+txtBox(S.txt[act.refl.id]);
+    h+='</section>';
+  });
+  h+='<section><h3>Autoevaluación</h3><table class="dt stk"><thead><tr><th style="width:7%">N°</th><th style="width:40%">Pregunta</th><th>Tu respuesta</th><th style="width:15%">Control</th></tr></thead><tbody>';
+  QS.forEach((q,i)=>{
+    const a=S.quiz[i];
+    const st=!a?'none':(a===q.letra?'ok':'bad');
+    const txt=!a?'Sin responder':(a===q.letra?'✔ Correcta':'✘ Incorrecta');
+    const resp=!a?'—':(a+'. '+q.o['ABC'.indexOf(a)]);
+    h+='<tr><td data-label="N°">'+(i+1)+'</td><td data-label="Pregunta">'+esc(q.q)+'</td><td data-label="Tu respuesta">'+esc(resp)+(a!==q.letra?'<br><small><b>Respuesta correcta:</b> '+q.letra+'. '+esc(q.o['ABC'.indexOf(q.letra)])+'</small>':'')+'</td><td class="st '+st+'" data-label="Control">'+txt+'</td></tr>';
+  });
+  h+='</tbody></table></section>';
+  $('#e-body').innerHTML=h;
+  $('#e-dudas').value=S.txt.dudas||''; $('#e-dudas-p').innerHTML=S.txt.dudas&&S.txt.dudas.trim()?esc(S.txt.dudas):'(Sin comentarios)';
+  let d='<thead><tr><th style="width:5%">F</th>'+HEAD.map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>';
+  for(let r=R1;r<=R2;r++){ d+='<tr><td>'+r+'</td>'+COLS.map(c=>'<td>'+esc(cellVal(c,r))+'</td>').join('')+'</tr>'; }
+  $('#e-data').innerHTML=d+'</tbody>';
+}
+[['e-nombre','nombre'],['e-grupo','grupo'],['e-fecha','fecha']].forEach(p=>{
+  $('#'+p[0]).addEventListener('input',e=>{S.id[p[1]]=e.target.value; save();});
+});
+$('#e-dudas').addEventListener('input',e=>{S.txt.dudas=e.target.value; save(); $('#e-dudas-p').innerHTML=e.target.value.trim()?esc(e.target.value):'(Sin comentarios)';});
+function safeName(s){return String(s||'').replace(/[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ ]+/g,' ').trim().replace(/\s+/g,'_');}
+$('#e-print').addEventListener('click',()=>{
+  if(!(S.id.nombre||'').trim()){toast('Completá tu nombre antes de guardar el PDF.'); $('#e-nombre').focus(); return;}
+  const old=document.title;
+  document.title='Entrega_Recuperacion_'+safeName(S.id.nombre)+(S.id.grupo?'_'+safeName(S.id.grupo):'');
+  const back=()=>{document.title=old;};
+  window.addEventListener('afterprint',back,{once:true});
+  setTimeout(back,60000);
+  window.print();
+});
+
+/* ---------- modo docente ---------- */
+$('#doc-fill').addEventListener('click',()=>{
+  EX.forEach((e,i)=>{S.ans[i]=e.s;});
+  QS.forEach((q,i)=>{S.quiz[i]=q.letra;});
+  S.id={nombre:'Estudiante de ejemplo',grupo:'1.° A',fecha:new Date().toLocaleDateString('es-UY')};
+  S.txt={r1:'Porque 2b cuenta las celdas con número y 2c las vacías. Entre las dos están las 12 filas del producto, así que 10 + 2 = 12.',r2:'Muestra "Baja", porque Excel trata la celda vacía como 0 y 0 no es 20 o más. No es lo ideal: el stock no está en cero, solo falta cargarlo.',dudas:'Ninguna.'};
+  save(); renderPractice(); renderQuiz(); renderHome(); toast('Respuestas modelo cargadas');
+});
+
+/* ---------- inicio de la app ---------- */
+renderBasicos();
+renderFunciones();
+pGrid=buildGrid($('#p-side'),{onPick:p=>{
+  if(p.type==='cell') insertRef(p.cell.col+p.cell.row,p.add);
+  else{
+    const c1=p.a.col, c2=p.b.col, r1=Math.min(p.a.row,p.b.row), r2=Math.max(p.a.row,p.b.row);
+    const lo=c1<c2?c1:c2, hi=c1<c2?c2:c1;
+    insertRef(lo+r1+':'+hi+r2,false);
+  }
+},extraHint:'Ctrl o Cmd + clic agrega una celda suelta con punto y coma.'});
+renderPractice();
+renderQuiz();
+route();
+})();
+
+</script>
+</body>
+</html>
